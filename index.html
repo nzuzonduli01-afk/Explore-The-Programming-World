@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | Programming Languages</title>
+<style>
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff; 
+    overflow: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    backdrop-filter: blur(8px); 
+    background-color: rgba(0,0,0,0.5); 
+    z-index: 0;
+  }
+
+  header {
+    background-color: #0d1b2a;
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 2;
+  }
+  header h1 { font-size: 2rem; letter-spacing: 1px; }
+
+  main {
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #222;
+    padding: 2rem;
+    border-radius: 50px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    animation: fadeSlideIn 0.6s ease-out;
+    position: relative;
+    z-index: 1;
+  }
+    main h2 { color: #0051ff; }
+
+  @keyframes fadeSlideIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  small { display: block; margin-bottom: 1rem; color: #555; font-size: 0.9rem; }
+  input[type="text"] { width: 100%; padding: 0.75rem 1rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
+  .checkbox-container { display: flex; align-items: center; margin-bottom: 1rem; justify-content: flex-start; gap: 0.5rem; font-size: 0.9rem; }
+  button { background: linear-gradient(45deg, #006eff, #242bff); color: #fff; border: none; padding: 0.75rem 1.5rem; border-radius: 15px; cursor: pointer; font-size: 1rem; transition: background-color 0.10s ease; }
+  button:hover { background: linear-gradient(45deg, #40c8f5, #047fc6);transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+  .error { color: red; font-size: 0.85rem; margin-bottom: 1rem; }
+  .returning-container { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .returning-container button { background-color: #242bff; color: #ffffff; }
+
+  @media (max-width: 400px) {
+    header h1 { font-size: 1.2rem; }
+    main { padding: 1rem; }
+    button { padding: 0.6rem 1rem; font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Explore Programming Languages</h1>
+</header>
+
+<main>
+  <h2>Welcome to The World of Programming!</h2><br>
+  <small>Please enter your name to get started.</small>
+  <div id="form-container">
+    <input type="text" id="username" placeholder="Enter your name">
+    <div class="checkbox-container">
+      <input type="checkbox" id="remember"> <label for="remember">Remember my name</label>
+    </div>
+    <div class="error" id="error-message"></div>
+    <button id="start-btn">Start Learning</button>
+  </div>
+
+  <div class="returning-container" id="returning-container" style="display:none;">
+    <button id="continue-btn"></button>
+    <button id="clear-btn">Clear saved name</button>
+  </div>
+</main>
+
+<script>
+  const usernameInput = document.getElementById('username');
+  const startBtn = document.getElementById('start-btn');
+  const rememberCheckbox = document.getElementById('remember');
+  const errorMessage = document.getElementById('error-message');
+
+  const returningContainer = document.getElementById('returning-container');
+  const continueBtn = document.getElementById('continue-btn');
+  const clearBtn = document.getElementById('clear-btn');
+
+  // Rotating background images
+  const backgrounds = [
+  'https://images.unsplash.com/photo-1517433456452-f9633a875f6f?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1505685296765-3a2736de412f?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1551033406-611cf9a28f67?auto=format&fit=crop&w=1200&q=80',
+  'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80',
+];
+  const randomIndex = Math.floor(Math.random() * backgrounds.length);
+  document.body.style.background = `url('${backgrounds[randomIndex]}') no-repeat center center / cover`;
+
+  // Show returning user options if username exists in localStorage
+  const savedName = localStorage.getItem('username');
+  if (savedName) {
+    document.getElementById('form-container').style.display = 'none';
+    returningContainer.style.display = 'flex';
+    continueBtn.textContent = `Continue as ${savedName}`;
+  }
+
+  // Start Learning button click
+  startBtn.addEventListener('click', () => {
+    const name = usernameInput.value.trim();
+    if (name === '') {
+      errorMessage.textContent = 'Please enter your name';
+      return;
+    }
+    errorMessage.textContent = '';
+
+    // Save name only if "Remember me" is checked
+    if (rememberCheckbox.checked) {
+      localStorage.setItem('username', name);
+    }
+
+    // Always pass username via query string to index.html
+    window.location.href = `landing-page.html?username=${encodeURIComponent(name)}`;
+  });
+
+  // Continue as returning user
+  continueBtn.addEventListener('click', () => {
+    window.location.href = 'landing-page.html';
+  });
+
+  // Clear saved name
+  clearBtn.addEventListener('click', () => {
+    localStorage.removeItem('username');
+    location.reload();
+  });
+</script>
+
+</body>
+</html>
